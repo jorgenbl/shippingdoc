@@ -102,8 +102,10 @@ class MyGrid(GridLayout):
             container_row["NAME"] = containerDict["attrs"]["Name"].split("/")[1]
             self.data.append(container_row)
 
-        self.cols = len(self.data[0].keys())
-        
+        try:
+            self.cols = len(self.data[0].keys())
+        except:
+            self.cols = 0        
 
     def display_list(self):
         self.clear_widgets()
@@ -118,16 +120,22 @@ class MyGrid(GridLayout):
 
     def create_table_header(self, i):
         cols = []
-        row_keys = self.data[i].keys()
-        for key in row_keys:
-            cols.append(TableHeader(text=key))
+        try:
+            row_keys = self.data[i].keys()
+            for key in row_keys:
+                cols.append(TableHeader(text=key))
+        except:
+            pass
         return cols
 
     def create_table(self, i):
         cols = []
-        row_keys = self.data[i].keys()
-        for key in row_keys:
-            cols.append(DockerRecord(text=self.data[i][key]))
+        try:
+            row_keys = self.data[i].keys()
+            for key in row_keys:
+                cols.append(DockerRecord(text=self.data[i][key]))
+        except:
+            pass
         return cols
 
 class DockerDB(BoxLayout):
