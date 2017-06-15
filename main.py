@@ -8,6 +8,7 @@ import docker
 from datetime import datetime
 import time
 from collections import OrderedDict
+from hurry.filesize import size
 
 class LastUpdatedOrderedDict(OrderedDict):
     'Store items in the order the keys were last added'
@@ -34,7 +35,7 @@ class MyGrid(GridLayout):
     def __init__(self, **kwargs):
         super(MyGrid, self).__init__(**kwargs)
         self.get_containers()
-        self.display_containers()
+        self.display_list()
 
 
     def display_time(self, seconds, granularity=2):
@@ -56,6 +57,29 @@ class MyGrid(GridLayout):
                 result.append("{} {}".format(value, name))
         return ', '.join(result[:granularity])
 
+    def get_images(self):
+        self.data = []
+
+        # Time initializations
+        fmt = '%Y-%m-%dT%H:%M:%S'
+        now = datetime.strptime(datetime.now().isoformat().split(".")[0], fmt)
+        now_ts = time.mktime(now.timetuple())
+
+        client = docker.from_env()
+        for image in client.images.list():
+            image_row = OrderedDict()
+            imageDict = image.__dict__
+            print imageDict
+            image_row["REPOSITORY"] = imageDict["attrs"]["RepoTags"][0].split(":")[0]
+            #image_row["REPOSITORY"] = imageDict["attrs"]["RepoDigests"][0].split("@")[0]
+            image_row["TAG"] = imageDict["attrs"]["RepoTags"][0].split(":")[1]
+            image_row["IMAGE ID"] = imageDict["attrs"]["Id"][0].split(":")[1][:12]
+            created_ts = int(imageDict["attrs"]["Created"])
+            image_row["CREATED"] = self.display_time(int(now_ts-created_ts))
+            image_row["SIZE"] = size(int(imageDict["attrs"]["Size"]))
+            self.data.append(image_row)
+
+        self.cols = len(self.data[0].keys())
 
     def get_containers(self, all=False):
         self.data = []
@@ -81,7 +105,7 @@ class MyGrid(GridLayout):
         self.cols = len(self.data[0].keys())
         
 
-    def display_containers(self):
+    def display_list(self):
         self.clear_widgets()
         row = self.create_table_header(0)
         for item in row:
@@ -138,19 +162,19 @@ class DockerDB(BoxLayout):
         self.docker_list._trigger_reset_populate()
 
     def list_images(self):
-        # Get all images and add to listview
-        # Reset the listview
-        self.docker_grid.display_containers()
+        # Get all containers and add to grid
+        self.docker_grid.get_images()
+        self.docker_grid.display_list()
 
     def list_all_containers(self):
-        # Clear Docker List
-        for child in self.docker_grid.children[:]:
-            print(child)
-            self.docker_grid.remove_widget(child)
+ #       # Clear Docker List
+ #       for child in self.docker_grid.children[:]:
+ #           print(child)
+ #           self.docker_grid.remove_widget(child)
 
         # Get all containers and add to grid
         self.docker_grid.get_containers(all=True)
-        self.docker_grid.display_containers()
+        self.docker_grid.display_list()
 
 
 
