@@ -1,0 +1,83 @@
+#: kivy 1.10.0
+#: import main main
+#: import ListAdapter kivy.adapters.listadapter.ListAdapter
+#: import ListItemButton kivy.uix.listview.ListItemButton
+
+<DockerRecord>:
+    size_hint_y: None
+    height: '30dp'
+    width: '100dp'
+
+    canvas.before:
+        Color:
+            rgb: 0.2, 0.2, 0.2
+        Rectangle:
+            pos: self.pos
+            size: self.size
+<TableHeader>:
+    size_hint_y: None
+    height: '30dp'
+    width: '100dp'
+
+    canvas.before:
+        Color:
+            rgb: 0.5, 0.5, 0.5
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+<DockerDB>:
+    orientation: "vertical"
+    image_text_input: image
+    container_text_input: container
+    docker_grid: docker_grid_view
+    padding: 10
+    spacing: 10
+
+    BoxLayout:
+        size_hint_y: None
+        height: "40dp"
+
+        Label:
+            text: "Image"
+        TextInput:
+            id: image
+        Label:
+            text: "Container"
+        TextInput:
+            id: container
+
+    BoxLayout:
+        size_hint_y: None
+        height: "40dp"
+
+        Button:
+            text: "List Images"
+            size_hint_x: 15
+            on_press: root.list_images()
+        Button:
+            text: "Find Image"
+            size_hint_x: 15
+            on_press: root.find_image()
+        Button:
+            text: "List All Containers"
+            size_hint_x: 15
+            on_press: root.list_all_containers()
+        Button:
+            text: "Find Container"
+            size_hint_x: 15
+            on_press: root.find_container()
+
+
+
+    AnchorLayout:
+        anchor_x: 'center'
+        anchor_y: 'center'
+
+        ScrollView:
+
+            MyGrid:
+                id: docker_grid_view
+                size_hint_y: None
+                height: self.minimum_height
+                spacing: '1dp'

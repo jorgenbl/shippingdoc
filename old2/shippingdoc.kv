@@ -1,0 +1,52 @@
+#: kivy 1.10.0
+#: import main main
+#: import ListAdapter kivy.adapters.listadapter.ListAdapter
+#: import ListItemButton kivy.uix.listview.ListItemButton
+
+
+<DockerDB>:
+    orientation: "vertical"
+    image_text_input: image
+    container_text_input: container
+    docker_list: docker_list_view
+    padding: 10
+    spacing: 10
+
+    BoxLayout:
+        size_hint_y: None
+        height: "40dp"
+
+        Label:
+            text: "Image"
+        TextInput:
+            id: image
+        Label:
+            text: "Container"
+        TextInput:
+            id: container
+
+    BoxLayout:
+        size_hint_y: None
+        height: "40dp"
+
+        Button:
+            text: "List Images"
+            size_hint_x: 15
+            on_press: root.list_images()
+        Button:
+            text: "Find Image"
+            size_hint_x: 15
+            on_press: root.find_image()
+        Button:
+            text: "List Containers"
+            size_hint_x: 15
+            on_press: root.list_containers()
+        Button:
+            text: "Find Container"
+            size_hint_x: 15
+            on_press: root.find_container()
+
+    ListView:
+        id: docker_list_view
+        adapter:
+            ListAdapter(data=[], cls=main.DockerListButton)
