@@ -73,7 +73,7 @@ class MyGrid(GridLayout):
             image_row["REPOSITORY"] = imageDict["attrs"]["RepoTags"][0].split(":")[0]
             #image_row["REPOSITORY"] = imageDict["attrs"]["RepoDigests"][0].split("@")[0]
             image_row["TAG"] = imageDict["attrs"]["RepoTags"][0].split(":")[1]
-            image_row["IMAGE ID"] = imageDict["attrs"]["Id"][0].split(":")[1][:12]
+            image_row["IMAGE ID"] = imageDict["attrs"]["Id"].split(":")[1][:12]
             created_ts = int(imageDict["attrs"]["Created"])
             image_row["CREATED"] = self.display_time(int(now_ts-created_ts))
             image_row["SIZE"] = size(int(imageDict["attrs"]["Size"]))
