@@ -66,20 +66,27 @@ class MyGrid(GridLayout):
         now_ts = time.mktime(now.timetuple())
 
         client = docker.from_env()
-        for image in client.images.list():
-            image_row = OrderedDict()
-            imageDict = image.__dict__
-            print imageDict
-            image_row["REPOSITORY"] = imageDict["attrs"]["RepoTags"][0].split(":")[0]
-            #image_row["REPOSITORY"] = imageDict["attrs"]["RepoDigests"][0].split("@")[0]
-            image_row["TAG"] = imageDict["attrs"]["RepoTags"][0].split(":")[1]
-            image_row["IMAGE ID"] = imageDict["attrs"]["Id"].split(":")[1][:12]
-            created_ts = int(imageDict["attrs"]["Created"])
-            image_row["CREATED"] = self.display_time(int(now_ts-created_ts))
-            image_row["SIZE"] = size(int(imageDict["attrs"]["Size"]))
-            self.data.append(image_row)
-
-        self.cols = len(self.data[0].keys())
+        try:
+            for image in client.images.list():
+                image_row = OrderedDict()
+                imageDict = image.__dict__
+                print imageDict
+                image_row["REPOSITORY"] = imageDict["attrs"]["RepoTags"][0].split(":")[0]
+                #image_row["REPOSITORY"] = imageDict["attrs"]["RepoDigests"][0].split("@")[0]
+                image_row["TAG"] = imageDict["attrs"]["RepoTags"][0].split(":")[1]
+                image_row["IMAGE ID"] = imageDict["attrs"]["Id"].split(":")[1][:12]
+                created_ts = int(imageDict["attrs"]["Created"])
+                image_row["CREATED"] = self.display_time(int(now_ts-created_ts))
+                image_row["SIZE"] = size(int(imageDict["attrs"]["Size"]))
+                self.data.append(image_row)
+        except:
+            # unable to connect with docker socket:
+            # requests.exceptions.ConnectionError: ('Connection aborted.', error(2, 'No such file or directory'))
+            pass
+        try:
+            self.cols = len(self.data[0].keys())
+        except:
+            self.cols = 0
 
     def get_containers(self, all=False):
         self.data = []
@@ -91,16 +98,21 @@ class MyGrid(GridLayout):
 
 
         client = docker.from_env()
-        for container in client.containers.list(all):
-            container_row = OrderedDict()
-            containerDict = container.__dict__
-            container_row["CONTAINER ID"] = containerDict["attrs"]["Config"]["Hostname"]
-            container_row["IMAGE"] = containerDict["attrs"]["Config"]["Image"]
-            created = datetime.strptime(containerDict["attrs"]["Created"].split(".")[0], fmt)
-            created_ts = time.mktime(created.timetuple())
-            container_row["CREATED"] = self.display_time(int(now_ts-created_ts))
-            container_row["NAME"] = containerDict["attrs"]["Name"].split("/")[1]
-            self.data.append(container_row)
+        try:
+            for container in client.containers.list(all):
+                container_row = OrderedDict()
+                containerDict = container.__dict__
+                container_row["CONTAINER ID"] = containerDict["attrs"]["Config"]["Hostname"]
+                container_row["IMAGE"] = containerDict["attrs"]["Config"]["Image"]
+                created = datetime.strptime(containerDict["attrs"]["Created"].split(".")[0], fmt)
+                created_ts = time.mktime(created.timetuple())
+                container_row["CREATED"] = self.display_time(int(now_ts-created_ts))
+                container_row["NAME"] = containerDict["attrs"]["Name"].split("/")[1]
+                self.data.append(container_row)
+        except:
+            # unable to connect with docker socket:
+            # requests.exceptions.ConnectionError: ('Connection aborted.', error(2, 'No such file or directory'))
+            pass
 
         try:
             self.cols = len(self.data[0].keys())
