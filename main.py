@@ -69,14 +69,22 @@ class MyGrid(GridLayout):
         for image in client.images.list():
             image_row = OrderedDict()
             imageDict = image.__dict__
-            print imageDict
-            image_row["REPOSITORY"] = imageDict["attrs"]["RepoTags"][0].split(":")[0]
-            #image_row["REPOSITORY"] = imageDict["attrs"]["RepoDigests"][0].split("@")[0]
-            image_row["TAG"] = imageDict["attrs"]["RepoTags"][0].split(":")[1]
+            #print imageDict
+            if imageDict["attrs"]["RepoTags"] != None:
+                print imageDict
+                print imageDict["attrs"]["RepoTags"][0]
+                image_row["REPOSITORY"] = imageDict["attrs"]["RepoTags"][0].split(":")[0]
+                image_row["TAG"] = imageDict["attrs"]["RepoTags"][0].split(":")[1]
+            else:
+                #print imageDict["attrs"]["RepoDigests"][0].split("@")[0]
+                image_row["REPOSITORY"] = imageDict["attrs"]["RepoDigests"][0].split("@")[0]
+                image_row["TAG"] = "<none>"
+
             image_row["IMAGE ID"] = imageDict["attrs"]["Id"].split(":")[1][:12]
             created_ts = int(imageDict["attrs"]["Created"])
             image_row["CREATED"] = self.display_time(int(now_ts-created_ts))
             image_row["SIZE"] = size(int(imageDict["attrs"]["Size"]))
+            #print image_row
             self.data.append(image_row)
 
         self.cols = len(self.data[0].keys())
